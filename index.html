@@ -21,6 +21,26 @@
                 <button id="export-data" class="ghost-btn" type="button">Export Data</button>
                 <button id="import-data" class="ghost-btn" type="button">Import Data</button>
                 <button id="clear-data" class="danger-btn" type="button">Clear</button>
+                <div class="header-menu">
+                    <button id="menu-toggle" class="ghost-btn menu-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="menu-dropdown">
+                        Menu
+                        <span class="menu-caret">▾</span>
+                    </button>
+                    <div id="menu-dropdown" class="menu-dropdown" role="menu" hidden>
+                        <button id="settings-toggle" class="menu-item" type="button" role="menuitem" aria-expanded="false" aria-controls="settings-panel">
+                            Settings
+                            <span class="menu-caret">▸</span>
+                        </button>
+                        <div id="settings-panel" class="menu-panel" role="group" hidden>
+                            <p class="menu-panel-subtitle">Annual enlistment goal</p>
+                            <label class="menu-field">
+                                <span>Enlistments needed</span>
+                                <input type="number" id="annual-goal-input" min="0" inputmode="numeric" />
+                            </label>
+                            <p class="menu-footnote">This target powers the goal progress indicator.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -31,9 +51,9 @@
                 <div class="stat-foot">Updated in real time from applicant stages</div>
             </article>
             <article class="stat-card">
-                <div class="stat-label">Active Goals</div>
-                <div class="stat-value" id="goal-count">0</div>
-                <div class="stat-foot">Keep teams aligned with recruitment targets</div>
+                <div class="stat-label">Annual Goal</div>
+                <div class="stat-value" id="goal-target">0</div>
+                <div class="stat-foot">Total enlistments needed this year</div>
             </article>
             <article class="stat-card">
                 <div class="stat-label">Upcoming Events</div>
@@ -132,12 +152,21 @@
                 <section class="goals-section">
                     <div class="panel-header compact">
                         <div>
-                            <h2>Enlistment Goals</h2>
-                            <p>Align recruitment targets with actual enlistments.</p>
+                            <h2>Annual Enlistment Goal</h2>
+                            <p>Track progress toward the yearly enlistment target.</p>
                         </div>
-                        <button id="add-goal" class="primary-btn" type="button">Add Goal</button>
+                        <div class="goal-chip">Goal: <span id="goal-target-chip">0</span></div>
                     </div>
-                    <div id="goals-list" class="goal-list" aria-live="polite"></div>
+                    <div class="annual-goal-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="annual-goal-fill" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                        </div>
+                        <div class="progress-meta">
+                            <span><strong id="goal-progress-count">0</strong> enlisted</span>
+                            <span id="goal-remaining-text">0 remaining</span>
+                        </div>
+                    </div>
+                    <p class="goal-note">Adjust the annual target from the Settings menu.</p>
                 </section>
             </aside>
         </main>
