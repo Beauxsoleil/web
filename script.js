@@ -5,7 +5,7 @@
     // Local storage keys
     const APPLICANTS_KEY = 'recruitment-applicants-v1';
     const EVENTS_KEY = 'recruitment-events-v1';
-    const GOALS_KEY = 'recruitment-goals-v1';
+    const ENLISTMENT_GOAL_KEY = 'recruitment-annual-goal-v1';
 
     // Stage presets used across the UI
     const STAGE_OPTIONS = [
@@ -23,14 +23,21 @@
     const addApplicantBtn = document.getElementById('add-applicant');
     const enlistedCountEl = document.getElementById('enlisted-count');
     const upcomingCountEl = document.getElementById('upcoming-count');
-    const goalCountEl = document.getElementById('goal-count');
+    const goalTargetEl = document.getElementById('goal-target');
+    const goalTargetChipEl = document.getElementById('goal-target-chip');
+    const goalProgressCountEl = document.getElementById('goal-progress-count');
+    const goalRemainingTextEl = document.getElementById('goal-remaining-text');
+    const annualGoalFillEl = document.getElementById('annual-goal-fill');
     const eventForm = document.getElementById('event-form');
     const eventListEl = document.getElementById('events-list');
     const todayEventsEl = document.getElementById('today-events');
     const eventApplicantSelect = document.getElementById('event-applicant');
     const rssBtn = document.getElementById('rss-feed');
-    const addGoalBtn = document.getElementById('add-goal');
-    const goalsListEl = document.getElementById('goals-list');
+    const menuToggleBtn = document.getElementById('menu-toggle');
+    const menuDropdownEl = document.getElementById('menu-dropdown');
+    const settingsToggleBtn = document.getElementById('settings-toggle');
+    const settingsPanelEl = document.getElementById('settings-panel');
+    const annualGoalInputEl = document.getElementById('annual-goal-input');
     const exportBtn = document.getElementById('export-data');
     const importBtn = document.getElementById('import-data');
     const clearBtn = document.getElementById('clear-data');
@@ -42,7 +49,7 @@
     // Attempt to load persisted data, otherwise seed realistic demo content
     let applicants = loadFromStorage(APPLICANTS_KEY, getSeedApplicants());
     let events = loadFromStorage(EVENTS_KEY, getSeedEvents());
-    let goals = loadFromStorage(GOALS_KEY, getSeedGoals());
+    let enlistmentGoal = loadNumberFromStorage(ENLISTMENT_GOAL_KEY, getDefaultGoal());
 
     // Track the calendar month being displayed
     let activeMonth = DateTime.now().startOf('month');
@@ -57,6 +64,12 @@
             console.warn(`Unable to parse data for ${key}`, error);
             return fallback;
         }
+    }
+
+    function loadNumberFromStorage(key, fallback) {
+        const value = loadFromStorage(key, fallback);
+        const parsed = typeof value === 'number' ? value : parseInt(value, 10);
+        return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
     }
 
     function persist(key, data) {
@@ -333,146 +346,97 @@
         updateSummaryStats();
     }
 
-    function renderGoals() {
-        goalsListEl.innerHTML = '';
+    function updateAnnualGoalUI(enlisted) {
+        if (!goalTargetEl) return;
 
-        if (!goals.length) {
-            const empty = document.createElement('p');
-            empty.className = 'empty-state';
-            empty.textContent = 'Set enlistment goals to monitor progress against targets.';
-            goalsListEl.appendChild(empty);
-            goalCountEl.textContent = '0';
+        goalTargetEl.textContent = enlistmentGoal.toString();
+        if (goalTargetChipEl) {
+            goalTargetChipEl.textContent = enlistmentGoal.toString();
+        }
+
+        if (goalProgressCountEl) {
+            goalProgressCountEl.textContent = enlisted.toString();
+        }
+
+        if (annualGoalInputEl && annualGoalInputEl.value !== enlistmentGoal.toString()) {
+            annualGoalInputEl.value = enlistmentGoal.toString();
+        }
+
+        if (goalRemainingTextEl) {
+            if (enlistmentGoal === 0) {
+                goalRemainingTextEl.textContent = 'No goal set';
+            } else {
+                const remaining = Math.max(enlistmentGoal - enlisted, 0);
+                goalRemainingTextEl.textContent = remaining === 0 ? 'Goal achieved' : `${remaining} remaining`;
+            }
+        }
+
+        if (annualGoalFillEl) {
+            const percent = enlistmentGoal > 0 ? Math.min(100, Math.round((enlisted / enlistmentGoal) * 100)) : 0;
+            annualGoalFillEl.style.width = `${percent}%`;
+            annualGoalFillEl.title = `${percent}% of goal`;
+            annualGoalFillEl.setAttribute('aria-valuenow', percent.toString());
+            annualGoalFillEl.setAttribute('aria-valuetext', `${percent}% of goal`);
+        }
+    }
+
+    function setMenuState(isOpen) {
+        if (!menuDropdownEl) return;
+        if (isOpen) {
+            menuDropdownEl.removeAttribute('hidden');
+        } else {
+            menuDropdownEl.setAttribute('hidden', '');
+        }
+        if (menuToggleBtn) {
+            menuToggleBtn.classList.toggle('is-open', isOpen);
+            menuToggleBtn.setAttribute('aria-expanded', isOpen.toString());
+        }
+        if (!isOpen) {
+            setSettingsPanelState(false);
+        }
+    }
+
+    function toggleMenu() {
+        if (!menuDropdownEl) return;
+        const isOpen = menuDropdownEl.hasAttribute('hidden');
+        setMenuState(isOpen);
+    }
+
+    function setSettingsPanelState(isOpen) {
+        if (!settingsPanelEl || !settingsToggleBtn) return;
+        if (isOpen) {
+            settingsPanelEl.removeAttribute('hidden');
+        } else {
+            settingsPanelEl.setAttribute('hidden', '');
+        }
+        settingsToggleBtn.classList.toggle('is-open', isOpen);
+        settingsToggleBtn.setAttribute('aria-expanded', isOpen.toString());
+    }
+
+    function toggleSettingsPanel() {
+        if (!settingsPanelEl) return;
+        const isOpen = settingsPanelEl.hasAttribute('hidden');
+        setSettingsPanelState(isOpen);
+    }
+
+    function handleGoalInputChange() {
+        if (!annualGoalInputEl) return;
+        const value = parseInt(annualGoalInputEl.value, 10);
+        if (!Number.isFinite(value) || value < 0) {
+            annualGoalInputEl.value = enlistmentGoal.toString();
             return;
         }
 
-        goals.forEach((goal) => {
-            const card = document.createElement('article');
-            card.className = 'goal-card';
-            card.dataset.id = goal.id;
-
-            const header = document.createElement('div');
-            header.className = 'goal-header';
-
-            const titleInput = document.createElement('input');
-            titleInput.type = 'text';
-            titleInput.value = goal.title || 'Untitled Goal';
-            titleInput.placeholder = 'Goal name';
-            titleInput.addEventListener('input', () => {
-                goal.title = titleInput.value;
-                persist(GOALS_KEY, goals);
-            });
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.type = 'button';
-            deleteBtn.className = 'danger-btn';
-            deleteBtn.textContent = 'Remove';
-            deleteBtn.addEventListener('click', () => removeGoal(goal.id));
-
-            header.append(titleInput, deleteBtn);
-
-            const grid = document.createElement('div');
-            grid.className = 'goal-grid';
-
-            const targetField = buildGoalNumberField('Target', goal.target || 0, (value) => {
-                goal.target = value;
-                persist(GOALS_KEY, goals);
-                updateGoalProgress(goal, card);
-            });
-            const currentField = buildGoalNumberField('Current', goal.current || 0, (value) => {
-                goal.current = value;
-                persist(GOALS_KEY, goals);
-                updateGoalProgress(goal, card);
-                updateSummaryStats();
-            });
-            const dueField = buildGoalTextField('Target Date', goal.dueDate || '', (value) => {
-                goal.dueDate = value;
-                persist(GOALS_KEY, goals);
-            });
-
-            grid.append(targetField, currentField, dueField);
-
-            const notesField = document.createElement('textarea');
-            notesField.placeholder = 'Notes, milestones, or blockers';
-            notesField.value = goal.notes || '';
-            notesField.addEventListener('input', () => {
-                goal.notes = notesField.value;
-                persist(GOALS_KEY, goals);
-            });
-
-            const notesWrapper = document.createElement('label');
-            notesWrapper.className = 'field';
-            notesWrapper.appendChild(document.createElement('span')).textContent = 'Notes';
-            notesWrapper.appendChild(notesField);
-
-            const progressBar = document.createElement('div');
-            progressBar.className = 'progress-bar';
-            const progressFill = document.createElement('div');
-            progressFill.className = 'progress-fill';
-            progressBar.appendChild(progressFill);
-
-            card.append(header, grid, notesWrapper, progressBar);
-            goalsListEl.appendChild(card);
-            updateGoalProgress(goal, card);
-        });
-
-        goalCountEl.textContent = goals.length.toString();
-    }
-
-    function buildGoalNumberField(label, value, onChange) {
-        const wrapper = document.createElement('label');
-        wrapper.className = 'field';
-        const span = document.createElement('span');
-        span.textContent = label;
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.min = '0';
-        input.value = value;
-        input.addEventListener('input', () => {
-            onChange(parseInt(input.value, 10) || 0);
-        });
-        wrapper.append(span, input);
-        return wrapper;
-    }
-
-    function buildGoalTextField(label, value, onChange) {
-        const wrapper = document.createElement('label');
-        wrapper.className = 'field';
-        const span = document.createElement('span');
-        span.textContent = label;
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = value;
-        input.placeholder = 'e.g. FY Q4';
-        input.addEventListener('input', () => onChange(input.value));
-        wrapper.append(span, input);
-        return wrapper;
-    }
-
-    function updateGoalProgress(goal, card) {
-        const fill = card.querySelector('.progress-fill');
-        const percent = goal.target > 0 ? Math.min(100, Math.round((goal.current / goal.target) * 100)) : 0;
-        fill.style.width = `${percent}%`;
-        fill.title = `${percent}% complete`;
-    }
-
-    function removeGoal(id) {
-        if (!confirm('Remove this goal?')) return;
-        goals = goals.filter((goal) => goal.id !== id);
-        persist(GOALS_KEY, goals);
-        renderGoals();
+        enlistmentGoal = value;
+        annualGoalInputEl.value = enlistmentGoal.toString();
+        persist(ENLISTMENT_GOAL_KEY, enlistmentGoal);
         updateSummaryStats();
     }
 
     function updateSummaryStats() {
         const enlisted = applicants.filter((applicant) => applicant.stage === 'Enlisted').length;
         enlistedCountEl.textContent = enlisted.toString();
-        goalCountEl.textContent = goals.length.toString();
-
-        // Update progress bars to reflect enlistment totals if they use applicants as metric
-        document.querySelectorAll('.goal-card').forEach((card) => {
-            const goal = goals.find((item) => item.id === card.dataset.id);
-            if (goal) updateGoalProgress(goal, card);
-        });
+        updateAnnualGoalUI(enlisted);
     }
 
     function updateApplicantOptions() {
@@ -671,7 +635,7 @@
         const payload = {
             applicants,
             events,
-            goals
+            enlistmentGoal
         };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -695,10 +659,11 @@
                     const data = JSON.parse(loadEvent.target.result);
                     applicants = data.applicants || [];
                     events = data.events || [];
-                    goals = data.goals || [];
+                    const importedGoal = parseInt(data.enlistmentGoal, 10);
+                    enlistmentGoal = Number.isFinite(importedGoal) && importedGoal >= 0 ? importedGoal : getDefaultGoal();
                     persist(APPLICANTS_KEY, applicants);
                     persist(EVENTS_KEY, events);
-                    persist(GOALS_KEY, goals);
+                    persist(ENLISTMENT_GOAL_KEY, enlistmentGoal);
                     refreshUI();
                     alert('Import complete.');
                 } catch (error) {
@@ -714,10 +679,11 @@
         if (!confirm('This will erase all stored data. Continue?')) return;
         localStorage.removeItem(APPLICANTS_KEY);
         localStorage.removeItem(EVENTS_KEY);
-        localStorage.removeItem(GOALS_KEY);
+        localStorage.removeItem(ENLISTMENT_GOAL_KEY);
         applicants = getSeedApplicants();
         events = getSeedEvents();
-        goals = getSeedGoals();
+        enlistmentGoal = getDefaultGoal();
+        persist(ENLISTMENT_GOAL_KEY, enlistmentGoal);
         refreshUI();
     }
 
@@ -725,8 +691,11 @@
         renderApplicants();
         updateApplicantOptions();
         renderEvents();
-        renderGoals();
         updateSummaryStats();
+    }
+
+    function getDefaultGoal() {
+        return 40;
     }
 
     function getSeedApplicants() {
@@ -782,19 +751,6 @@
                 notes: 'Bring previous medical records and ID.',
                 stage: 'Medical',
                 applicantId: ''
-            }
-        ];
-    }
-
-    function getSeedGoals() {
-        return [
-            {
-                id: crypto.randomUUID(),
-                title: 'Quarterly Enlistments',
-                target: 12,
-                current: 4,
-                dueDate: 'End of Q2',
-                notes: 'Focus on technical specialties pipeline.'
             }
         ];
     }
@@ -866,18 +822,42 @@
     });
 
     rssBtn.addEventListener('click', generateRSSFeed);
-    addGoalBtn.addEventListener('click', () => {
-        goals.push({
-            id: crypto.randomUUID(),
-            title: 'New Goal',
-            target: 1,
-            current: 0,
-            dueDate: '',
-            notes: ''
+
+    if (menuToggleBtn) {
+        menuToggleBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            toggleMenu();
         });
-        persist(GOALS_KEY, goals);
-        renderGoals();
-        updateSummaryStats();
+    }
+
+    if (settingsToggleBtn) {
+        settingsToggleBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            toggleSettingsPanel();
+        });
+    }
+
+    if (annualGoalInputEl) {
+        annualGoalInputEl.addEventListener('change', handleGoalInputChange);
+        annualGoalInputEl.addEventListener('blur', handleGoalInputChange);
+    }
+
+    document.addEventListener('click', (event) => {
+        if (!menuDropdownEl || menuDropdownEl.hasAttribute('hidden')) return;
+        if (
+            event.target === menuDropdownEl ||
+            menuDropdownEl.contains(event.target) ||
+            (menuToggleBtn && (event.target === menuToggleBtn || menuToggleBtn.contains(event.target)))
+        ) {
+            return;
+        }
+        setMenuState(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            setMenuState(false);
+        }
     });
 
     exportBtn.addEventListener('click', exportData);
