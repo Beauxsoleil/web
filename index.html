@@ -6,7 +6,7 @@
     <title>Recruitment Operations Hub</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1Xh6Z5Fj4g1+6K7tJcZz0p4a1p1r5V0w3AV/Q93skS8MaqkOawx2h8ailqDk3PzQ1YyF4C2Q2Yd3uFQ4mA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css" />
 </head>
@@ -15,29 +15,26 @@
         <header class="app-header">
             <div>
                 <h1>Recruitment Operations Hub</h1>
-                <p class="subtitle">Coordinate applicants, events, and enlistment goals in one streamlined workspace.</p>
+                <p class="subtitle">Coordinate applicants, events, and enlistment goals.</p>
             </div>
             <div class="header-actions">
-                <button id="export-data" class="ghost-btn" type="button">Export Data</button>
-                <button id="import-data" class="ghost-btn" type="button">Import Data</button>
-                <button id="clear-data" class="danger-btn" type="button">Clear</button>
+                <button id="export-data" class="ghost-btn" type="button" aria-label="Export all data to a JSON file">Export Data</button>
+                <button id="import-data" class="ghost-btn" type="button" aria-label="Import data from a JSON file">Import Data</button>
+                <button id="clear-data" class="danger-btn" type="button" aria-label="Clear all application data">Clear</button>
                 <div class="header-menu">
                     <button id="menu-toggle" class="ghost-btn menu-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="menu-dropdown">
-                        Menu
-                        <span class="menu-caret">▾</span>
+                        Menu <span class="menu-caret" aria-hidden="true">▾</span>
                     </button>
                     <div id="menu-dropdown" class="menu-dropdown" role="menu" hidden>
                         <button id="settings-toggle" class="menu-item" type="button" role="menuitem" aria-expanded="false" aria-controls="settings-panel">
-                            Settings
-                            <span class="menu-caret">▸</span>
+                            Settings <span class="menu-caret" aria-hidden="true">▸</span>
                         </button>
                         <div id="settings-panel" class="menu-panel" role="group" hidden>
-                            <p class="menu-panel-subtitle">Annual enlistment goal</p>
+                            <p class="menu-panel-subtitle">Annual Enlistment Goal</p>
                             <label class="menu-field">
-                                <span>Enlistments needed</span>
+                                <span>Enlistments Needed</span>
                                 <input type="number" id="annual-goal-input" min="0" inputmode="numeric" />
                             </label>
-                            <p class="menu-footnote">This target powers the goal progress indicator.</p>
                         </div>
                     </div>
                 </div>
@@ -63,11 +60,11 @@
         </section>
 
         <main class="layout-grid">
-            <section class="panel applicants-panel">
+            <section class="panel applicants-panel" aria-labelledby="applicant-heading">
                 <div class="panel-header">
                     <div>
-                        <h2>Applicant Management</h2>
-                        <p>Track APPLMDT stats, progress, and notes for each candidate.</p>
+                        <h2 id="applicant-heading">Applicant Management</h2>
+                        <p>Track candidate progress and details.</p>
                     </div>
                     <div class="panel-actions">
                         <button id="add-applicant" class="primary-btn" type="button">Add Applicant</button>
@@ -77,15 +74,14 @@
             </section>
 
             <aside class="panel side-panel">
-                <section class="calendar-wrapper">
+                <section class="calendar-wrapper" aria-labelledby="calendar-heading">
                     <div class="panel-header compact">
                         <div>
-                            <h2>Operations Calendar</h2>
-                            <p>Coordinate interviews, screenings, and enlistment events.</p>
+                            <h2 id="calendar-heading">Operations Calendar</h2>
                         </div>
                         <div class="calendar-controls">
                             <button id="prev-month" class="icon-btn" aria-label="Previous month">&#x2039;</button>
-                            <div id="current-month" class="month-label"></div>
+                            <div id="current-month" class="month-label" aria-live="polite"></div>
                             <button id="next-month" class="icon-btn" aria-label="Next month">&#x203A;</button>
                         </div>
                     </div>
@@ -96,58 +92,40 @@
                     </div>
                 </section>
 
-                <section class="event-form-section">
-                    <div class="panel-header compact">
-                        <div>
-                            <h2>Schedule Event</h2>
-                            <p>Add briefings, check-ins, and milestones.</p>
-                        </div>
-                    </div>
+                <section class="event-form-section" aria-labelledby="event-form-heading">
+                    <h2 id="event-form-heading" class="panel-header">Schedule Event</h2>
                     <form id="event-form" class="event-form">
-                        <input type="hidden" id="event-id" />
-                        <label>
-                            <span>Event Title</span>
-                            <input type="text" id="event-title" required placeholder="e.g. Medical Screening" />
-                        </label>
-                        <div class="form-row">
-                            <label>
-                                <span>Date</span>
-                                <input type="date" id="event-date" required />
-                            </label>
-                            <label>
-                                <span>Time</span>
-                                <input type="time" id="event-time" />
-                            </label>
-                        </div>
-                        <label>
-                            <span>Related Applicant</span>
-                            <select id="event-applicant">
-                                <option value="">General Event</option>
-                            </select>
-                        </label>
-                        <label>
-                            <span>Stage Focus</span>
-                            <input type="text" id="event-stage" placeholder="e.g. Background Check" />
-                        </label>
-                        <label>
-                            <span>Notes</span>
-                            <textarea id="event-notes" rows="3" placeholder="Key talking points or prep"></textarea>
-                        </label>
+                        <input type="hidden" id="event-id" name="event-id" />
+                        <label for="event-title">Event Title</label>
+                        <input type="text" id="event-title" name="title" required />
+
+                        <label for="event-date">Date</label>
+                        <input type="date" id="event-date" name="date" required />
+
+                        <label for="event-time">Time</label>
+                        <input type="time" id="event-time" name="time" />
+
+                        <label for="event-applicant">Related Applicant</label>
+                        <select id="event-applicant" name="applicantId"></select>
+
+                        <label for="event-notes">Notes</label>
+                        <textarea id="event-notes" name="notes" rows="3"></textarea>
+
                         <div class="form-actions">
-                            <button class="primary-btn" type="submit" id="save-event">Save Event</button>
-                            <button class="ghost-btn" type="button" id="reset-event">Reset</button>
+                            <button class="primary-btn" type="submit">Save Event</button>
                         </div>
                     </form>
-                    <div class="event-listing">
-                        <div class="panel-header compact">
-                            <div>
-                                <h3>Scheduled Events</h3>
-                            </div>
-                            <button id="rss-feed" class="ghost-btn" type="button">Generate RSS</button>
-                        </div>
-                        <ul id="events-list" class="event-list" aria-live="polite"></ul>
-                    </div>
                 </section>
+
+                <div class="event-listing">
+                    <div class="panel-header compact">
+                        <div>
+                            <h3>Scheduled Events</h3>
+                        </div>
+                        <button id="rss-feed" class="ghost-btn" type="button">Generate RSS</button>
+                    </div>
+                    <ul id="events-list" class="event-list" aria-live="polite"></ul>
+                </div>
 
                 <section class="goals-section">
                     <div class="panel-header compact">
@@ -172,12 +150,12 @@
         </main>
 
         <footer class="app-footer">
-            <p>Recruitment Operations Hub &mdash; client-side experience ready for GitHub Pages deployment.</p>
+            <p>Recruitment Operations Hub</p>
         </footer>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-/pD5JrYzsa3sGJNZaG0/gtKBPXn1HULICwhf66A1VpzwuNFuIBqmoeZaZX6mE6xPD58Ll35H5TADaBrJ0TUn1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js" integrity="sha512-8fjZCwXTlzAIXazhbugzuDUFcPRl1BDpRP70dNDO7xjMnIKh4j/wcgUp3NEPoPFcAckU4iigIvuXvYDn8ApX2g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
