@@ -3,181 +3,379 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recruitment Operations Hub</title>
+    <title>Recruiter Workspace</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1Xh6Z5Fj4g1+6K7tJcZz0p4a1p1r5V0w3AV/Q93skS8MaqkOawx2h8ailqDk3PzQ1YyF4C2Q2Yd3uFQ4mA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <div class="app-shell">
         <header class="app-header">
-            <div>
-                <h1>Recruitment Operations Hub</h1>
-                <p class="subtitle">Coordinate applicants, events, and enlistment goals in one streamlined workspace.</p>
+            <div class="branding">
+                <button id="logo-trigger" class="logo-trigger" type="button" aria-label="Upload unit logo">
+                    <img id="logo-display" src="" alt="Unit logo" />
+                    <span class="logo-fallback">Upload Logo</span>
+                </button>
+                <div>
+                    <h1>Recruiter Workspace</h1>
+                    <p class="subtitle">Multi-tab operations hub for applicants, events, and service after sale follow-through.</p>
+                </div>
             </div>
             <div class="header-actions">
-                <button id="export-data" class="ghost-btn" type="button">Export Data</button>
-                <button id="import-data" class="ghost-btn" type="button">Import Data</button>
-                <button id="clear-data" class="danger-btn" type="button">Clear</button>
-                <div class="header-menu">
-                    <button id="menu-toggle" class="ghost-btn menu-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="menu-dropdown">
-                        Menu
-                        <span class="menu-caret">▾</span>
-                    </button>
-                    <div id="menu-dropdown" class="menu-dropdown" role="menu" hidden>
-                        <button id="settings-toggle" class="menu-item" type="button" role="menuitem" aria-expanded="false" aria-controls="settings-panel">
-                            Settings
-                            <span class="menu-caret">▸</span>
-                        </button>
-                        <div id="settings-panel" class="menu-panel" role="group" hidden>
-                            <p class="menu-panel-subtitle">Annual enlistment goal</p>
-                            <label class="menu-field">
-                                <span>Enlistments needed</span>
-                                <input type="number" id="annual-goal-input" min="0" inputmode="numeric" />
-                            </label>
-                            <p class="menu-footnote">This target powers the goal progress indicator.</p>
-                        </div>
-                    </div>
-                </div>
+                <button id="export-store" class="ghost-btn" type="button">Export JSON</button>
+                <button id="import-store" class="ghost-btn" type="button">Import JSON</button>
+                <button id="share-store" class="ghost-btn" type="button">Share</button>
+                <button id="clear-store" class="danger-btn" type="button">Reset Data</button>
             </div>
         </header>
 
-        <section class="top-stats">
-            <article class="stat-card">
-                <div class="stat-label">Applicants Enlisted</div>
-                <div class="stat-value" id="enlisted-count">0</div>
-                <div class="stat-foot">Updated in real time from applicant stages</div>
-            </article>
-            <article class="stat-card">
-                <div class="stat-label">Annual Goal</div>
-                <div class="stat-value" id="goal-target">0</div>
-                <div class="stat-foot">Total enlistments needed this year</div>
-            </article>
-            <article class="stat-card">
-                <div class="stat-label">Upcoming Events</div>
-                <div class="stat-value" id="upcoming-count">0</div>
-                <div class="stat-foot">Events in the next 30 days</div>
-            </article>
-        </section>
+        <nav class="tab-bar" role="tablist" aria-label="Workspace views">
+            <button data-tab="dashboard" role="tab" aria-selected="true" class="tab-btn is-active">Dashboard</button>
+            <button data-tab="inbox" role="tab" aria-selected="false" class="tab-btn">Applicant Inbox</button>
+            <button data-tab="events" role="tab" aria-selected="false" class="tab-btn">Events</button>
+            <button data-tab="sas" role="tab" aria-selected="false" class="tab-btn">Service After Sale</button>
+            <button data-tab="reports" role="tab" aria-selected="false" class="tab-btn">Reports</button>
+            <button data-tab="workstation" role="tab" aria-selected="false" class="tab-btn">Work Station</button>
+            <button data-tab="settings" role="tab" aria-selected="false" class="tab-btn">Settings</button>
+        </nav>
 
-        <main class="layout-grid">
-            <section class="panel applicants-panel">
-                <div class="panel-header">
-                    <div>
-                        <h2>Applicant Management</h2>
-                        <p>Track APPLMDT stats, progress, and notes for each candidate.</p>
-                    </div>
-                    <div class="panel-actions">
-                        <button id="add-applicant" class="primary-btn" type="button">Add Applicant</button>
-                    </div>
+        <main class="tab-container">
+            <section id="dashboard" class="tab-panel" role="tabpanel">
+                <div class="grid dashboard-grid">
+                    <article class="card progress-card">
+                        <header>
+                            <h2>Enlistment Goal</h2>
+                            <span id="dashboard-goal"></span>
+                        </header>
+                        <div class="progress-wrapper">
+                            <div class="progress-bar">
+                                <div id="goal-progress" class="progress-fill" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                            </div>
+                            <dl class="progress-meta">
+                                <div>
+                                    <dt>Enlisted</dt>
+                                    <dd id="goal-enlisted">0</dd>
+                                </div>
+                                <div>
+                                    <dt>Remaining</dt>
+                                    <dd id="goal-remaining">0</dd>
+                                </div>
+                            </dl>
+                        </div>
+                        <footer>
+                            <p class="fine-print">Progress updates automatically when applicants reach the Enlisted stage.</p>
+                        </footer>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h2>Applicants Touched This Week</h2>
+                            <span class="metric" id="touched-this-week">0</span>
+                        </header>
+                        <ul id="touched-list" class="simple-list"></ul>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h2>Upcoming Events</h2>
+                            <span class="metric" id="upcoming-count">0</span>
+                        </header>
+                        <ul id="dashboard-events" class="simple-list"></ul>
+                    </article>
+
+                    <article class="card">
+                        <header>
+                            <h2>Aging Summary Notification</h2>
+                        </header>
+                        <p class="fine-print">
+                            Configure warn and danger thresholds in Settings. Daily summary reminders deliver via the Notification Service.
+                        </p>
+                        <div class="card-actions">
+                            <button id="test-aging" class="ghost-btn" type="button">Send Test Summary</button>
+                        </div>
+                    </article>
                 </div>
-                <div id="applicants-list" class="applicant-list" aria-live="polite"></div>
             </section>
 
-            <aside class="panel side-panel">
-                <section class="calendar-wrapper">
-                    <div class="panel-header compact">
-                        <div>
-                            <h2>Operations Calendar</h2>
-                            <p>Coordinate interviews, screenings, and enlistment events.</p>
-                        </div>
-                        <div class="calendar-controls">
-                            <button id="prev-month" class="icon-btn" aria-label="Previous month">&#x2039;</button>
-                            <div id="current-month" class="month-label"></div>
-                            <button id="next-month" class="icon-btn" aria-label="Next month">&#x203A;</button>
-                        </div>
-                    </div>
-                    <div class="calendar-grid" id="calendar-grid" role="grid"></div>
-                    <div class="today-section">
-                        <h3>Today</h3>
-                        <ul id="today-events" class="event-list" aria-live="polite"></ul>
-                    </div>
-                </section>
-
-                <section class="event-form-section">
-                    <div class="panel-header compact">
-                        <div>
-                            <h2>Schedule Event</h2>
-                            <p>Add briefings, check-ins, and milestones.</p>
-                        </div>
-                    </div>
-                    <form id="event-form" class="event-form">
-                        <input type="hidden" id="event-id" />
-                        <label>
-                            <span>Event Title</span>
-                            <input type="text" id="event-title" required placeholder="e.g. Medical Screening" />
-                        </label>
-                        <div class="form-row">
-                            <label>
-                                <span>Date</span>
-                                <input type="date" id="event-date" required />
-                            </label>
-                            <label>
-                                <span>Time</span>
-                                <input type="time" id="event-time" />
-                            </label>
-                        </div>
-                        <label>
-                            <span>Related Applicant</span>
-                            <select id="event-applicant">
-                                <option value="">General Event</option>
-                            </select>
-                        </label>
-                        <label>
-                            <span>Stage Focus</span>
-                            <input type="text" id="event-stage" placeholder="e.g. Background Check" />
-                        </label>
-                        <label>
-                            <span>Notes</span>
-                            <textarea id="event-notes" rows="3" placeholder="Key talking points or prep"></textarea>
-                        </label>
-                        <div class="form-actions">
-                            <button class="primary-btn" type="submit" id="save-event">Save Event</button>
-                            <button class="ghost-btn" type="button" id="reset-event">Reset</button>
-                        </div>
-                    </form>
-                    <div class="event-listing">
-                        <div class="panel-header compact">
-                            <div>
-                                <h3>Scheduled Events</h3>
+            <section id="inbox" class="tab-panel" role="tabpanel" hidden>
+                <div class="panel-grid">
+                    <section class="card">
+                        <header>
+                            <h2>Quick Add Applicant</h2>
+                        </header>
+                        <form id="applicant-form" class="stacked">
+                            <div class="field">
+                                <label>Full Name<input type="text" id="applicant-name" required /></label>
                             </div>
-                            <button id="rss-feed" class="ghost-btn" type="button">Generate RSS</button>
-                        </div>
-                        <ul id="events-list" class="event-list" aria-live="polite"></ul>
-                    </div>
-                </section>
+                            <div class="field">
+                                <label>Current Stage
+                                    <select id="applicant-stage"></select>
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <label>Age<input type="number" id="applicant-age" min="16" max="60" /></label>
+                                <label>Phone<input type="tel" id="applicant-phone" /></label>
+                                <label>Email<input type="email" id="applicant-email" /></label>
+                            </div>
+                            <div class="form-row">
+                                <label>Height (in)<input type="number" id="applicant-height" min="50" max="90" /></label>
+                                <label>Weight (lb)<input type="number" id="applicant-weight" min="80" max="350" /></label>
+                            </div>
+                            <div class="field">
+                                <label>Notes<textarea id="applicant-notes" rows="2"></textarea></label>
+                            </div>
+                            <div class="card-actions">
+                                <button class="primary-btn" type="submit">Add Applicant</button>
+                                <button class="ghost-btn" type="button" id="evaluate-body-comp">Evaluate Body Composition</button>
+                            </div>
+                        </form>
+                    </section>
 
-                <section class="goals-section">
-                    <div class="panel-header compact">
-                        <div>
-                            <h2>Annual Enlistment Goal</h2>
-                            <p>Track progress toward the yearly enlistment target.</p>
+                    <section class="card">
+                        <header class="filter-header">
+                            <h2>Applicant Inbox</h2>
+                            <div class="filter-controls">
+                                <label class="search-field">
+                                    <span class="sr-only">Search applicants</span>
+                                    <input type="search" id="applicant-search" placeholder="Search applicants" />
+                                </label>
+                                <select id="stage-filter"></select>
+                            </div>
+                        </header>
+                        <div id="applicant-list" class="list-column"></div>
+                    </section>
+
+                    <section class="card">
+                        <header>
+                            <h2>Document Checklist &amp; File Cabinet</h2>
+                        </header>
+                        <form id="checklist-form" class="stacked">
+                            <div class="form-row">
+                                <label>Checklist Item<input type="text" id="checklist-name" required /></label>
+                                <label>Synonyms (comma separated)<input type="text" id="checklist-synonyms" /></label>
+                            </div>
+                            <label>Notes<textarea id="checklist-notes" rows="2"></textarea></label>
+                            <label class="file-input">Attach Artifact<input type="file" id="checklist-file" accept="image/*,application/pdf" /></label>
+                            <div class="card-actions">
+                                <button class="primary-btn" type="submit">Add to Cabinet</button>
+                                <button class="ghost-btn" type="button" id="scan-document">Scan &amp; Suggest</button>
+                            </div>
+                        </form>
+                        <ul id="checklist-items" class="file-list"></ul>
+                    </section>
+                </div>
+            </section>
+
+            <section id="events" class="tab-panel" role="tabpanel" hidden>
+                <div class="panel-grid">
+                    <section class="card">
+                        <header>
+                            <h2>Schedule Event</h2>
+                        </header>
+                        <form id="event-form" class="stacked">
+                            <input type="hidden" id="event-id" />
+                            <label>Title<input type="text" id="event-title" required /></label>
+                            <div class="form-row">
+                                <label>Date<input type="date" id="event-date" required /></label>
+                                <label>Time<input type="time" id="event-time" /></label>
+                                <label>Type<select id="event-type"></select></label>
+                            </div>
+                            <label>Applicant<select id="event-applicant"><option value="">-- General Event --</option></select></label>
+                            <label>Template<select id="event-template"><option value="">No Template</option></select></label>
+                            <label>Notes<textarea id="event-notes" rows="3"></textarea></label>
+                            <div class="card-actions">
+                                <button class="primary-btn" type="submit">Save Event</button>
+                                <button class="ghost-btn" type="button" id="reset-event">Reset</button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="card">
+                        <header class="filter-header">
+                            <h2>Event Timeline</h2>
+                            <select id="event-filter"></select>
+                        </header>
+                        <ul id="event-list" class="list-column"></ul>
+                    </section>
+
+                    <section class="card">
+                        <header>
+                            <h2>Calendar &amp; Hand-off</h2>
+                        </header>
+                        <div class="calendar-preview" id="calendar-preview"></div>
+                        <div class="card-actions">
+                            <button id="insert-calendar" class="ghost-btn" type="button">Add to Calendar</button>
+                            <button id="handoff-text" class="ghost-btn" type="button">Copy 1SG Text</button>
                         </div>
-                        <div class="goal-chip">Goal: <span id="goal-target-chip">0</span></div>
-                    </div>
-                    <div class="annual-goal-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="annual-goal-fill" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                    </section>
+                </div>
+            </section>
+
+            <section id="sas" class="tab-panel" role="tabpanel" hidden>
+                <div class="panel-grid">
+                    <section class="card">
+                        <header>
+                            <h2>SAS Tracker</h2>
+                        </header>
+                        <ul id="sas-list" class="list-column"></ul>
+                    </section>
+                    <section class="card">
+                        <header>
+                            <h2>Weekly Reminder Settings</h2>
+                        </header>
+                        <form id="sas-settings" class="stacked">
+                            <label>Reminder Day<select id="sas-day"></select></label>
+                            <label>Reminder Time<input type="time" id="sas-time" /></label>
+                            <div class="card-actions">
+                                <button class="primary-btn" type="submit">Schedule Reminder</button>
+                                <button class="ghost-btn" type="button" id="test-sas">Send Test Reminder</button>
+                            </div>
+                        </form>
+                    </section>
+                    <section class="card">
+                        <header>
+                            <h2>Generate SAS PDF</h2>
+                        </header>
+                        <p class="fine-print">Creates a shareable PDF summarizing enlisted applicants, drill dates, and follow-up notes.</p>
+                        <div class="card-actions">
+                            <button id="generate-sas" class="primary-btn" type="button">Generate PDF</button>
                         </div>
-                        <div class="progress-meta">
-                            <span><strong id="goal-progress-count">0</strong> enlisted</span>
-                            <span id="goal-remaining-text">0 remaining</span>
+                    </section>
+                </div>
+            </section>
+
+            <section id="reports" class="tab-panel" role="tabpanel" hidden>
+                <div class="panel-grid">
+                    <section class="card">
+                        <header>
+                            <h2>Applicant Pipeline Report</h2>
+                        </header>
+                        <p class="fine-print">Exports a stage-grouped PDF and weekly event rollup.</p>
+                        <div class="card-actions">
+                            <button id="generate-report" class="primary-btn" type="button">Export PDF</button>
                         </div>
-                    </div>
-                    <p class="goal-note">Adjust the annual target from the Settings menu.</p>
-                </section>
-            </aside>
+                    </section>
+                    <section class="card">
+                        <header>
+                            <h2>Data Portability</h2>
+                        </header>
+                        <form id="import-form" class="stacked">
+                            <label class="file-input">Import Snapshot<input type="file" id="import-file" accept="application/json" /></label>
+                        </form>
+                        <div class="card-actions">
+                            <button id="export-week" class="ghost-btn" type="button">Export Weekly Snapshot</button>
+                        </div>
+                    </section>
+                    <section class="card">
+                        <header>
+                            <h2>Share via System Sheet</h2>
+                        </header>
+                        <p class="fine-print">Uses the Web Share API when available.</p>
+                        <div class="card-actions">
+                            <button id="share-week" class="ghost-btn" type="button">Share Report</button>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <section id="workstation" class="tab-panel" role="tabpanel" hidden>
+                <div class="panel-grid">
+                    <section class="card">
+                        <header>
+                            <h2>FY Drill Planner</h2>
+                        </header>
+                        <form id="drill-form" class="stacked">
+                            <label>Month<select id="drill-month"></select></label>
+                            <label>Focus<textarea id="drill-focus" rows="2"></textarea></label>
+                            <div class="card-actions">
+                                <button class="primary-btn" type="submit">Add Plan</button>
+                            </div>
+                        </form>
+                        <ul id="drill-list" class="list-column"></ul>
+                    </section>
+                    <section class="card">
+                        <header>
+                            <h2>Snippet Library</h2>
+                        </header>
+                        <form id="snippet-form" class="stacked">
+                            <label>Title<input type="text" id="snippet-title" /></label>
+                            <label>Content<textarea id="snippet-body" rows="3"></textarea></label>
+                            <div class="card-actions">
+                                <button class="primary-btn" type="submit">Save Snippet</button>
+                            </div>
+                        </form>
+                        <ul id="snippet-list" class="list-column"></ul>
+                    </section>
+                    <section class="card">
+                        <header>
+                            <h2>Pack Checklist &amp; Trip Planner</h2>
+                        </header>
+                        <form id="pack-form" class="stacked">
+                            <label>Item<input type="text" id="pack-item" /></label>
+                            <label>Trip Notes<textarea id="trip-notes" rows="2"></textarea></label>
+                            <div class="card-actions">
+                                <button class="primary-btn" type="submit">Add Item</button>
+                            </div>
+                        </form>
+                        <ul id="pack-list" class="list-column"></ul>
+                    </section>
+                </div>
+            </section>
+
+            <section id="settings" class="tab-panel" role="tabpanel" hidden>
+                <div class="panel-grid">
+                    <section class="card">
+                        <header>
+                            <h2>Profile &amp; Personalization</h2>
+                        </header>
+                        <form id="settings-form" class="stacked">
+                            <label>Recruiter Name<input type="text" id="profile-name" /></label>
+                            <label>Accent Theme<select id="accent-theme"></select></label>
+                            <label>Annual Enlistment Goal<input type="number" id="annual-goal" min="0" /></label>
+                            <div class="form-row">
+                                <label>Aging Warn (days)<input type="number" id="aging-warn" min="1" /></label>
+                                <label>Aging Danger (days)<input type="number" id="aging-danger" min="1" /></label>
+                            </div>
+                            <label>SAS Reminder Lead Time (days)<input type="number" id="sas-lead" min="0" /></label>
+                            <label>Calendar Selection<select id="calendar-select"></select></label>
+                            <div class="card-actions">
+                                <button class="primary-btn" type="submit">Save Settings</button>
+                            </div>
+                        </form>
+                    </section>
+                    <section class="card">
+                        <header>
+                            <h2>Gator Snack Time</h2>
+                        </header>
+                        <p class="fine-print">Hidden mini-game for quick morale boosts. Tap the gator to feed snacks!</p>
+                        <div id="gator-game" class="gator-game" role="button" tabindex="0" aria-pressed="false">🐊</div>
+                        <p id="gator-score" class="fine-print">Score: 0</p>
+                    </section>
+                </div>
+            </section>
         </main>
-
-        <footer class="app-footer">
-            <p>Recruitment Operations Hub &mdash; client-side experience ready for GitHub Pages deployment.</p>
-        </footer>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-/pD5JrYzsa3sGJNZaG0/gtKBPXn1HULICwhf66A1VpzwuNFuIBqmoeZaZX6mE6xPD58Ll35H5TADaBrJ0TUn1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <div id="scan-modal" class="modal" hidden>
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2>Scan Document</h2>
+                <button id="close-modal" class="icon-btn" type="button" aria-label="Close">×</button>
+            </header>
+            <div class="modal-body">
+                <label class="file-input">Capture Pages<input type="file" id="scan-input" accept="image/*" capture="environment" multiple /></label>
+                <div id="scan-preview" class="scan-preview"></div>
+                <div id="ocr-suggestions" class="ocr-suggestions"></div>
+            </div>
+        </div>
+    </div>
+
+    <input id="logo-input" type="file" accept="image/*" hidden />
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js" integrity="sha512-8fjZCwXTlzAIXazhbugzuDUFcPRl1BDpRP70dNDO7xjMnIKh4j/wcgUp3NEPoPFcAckU4iigIvuXvYDn8ApX2g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-/pD5JrYzsa3sGJNZaG0/gtKBPXn1HULICwhf66A1VpzwuNFuIBqmoeZaZX6mE6xPD58Ll35H5TADaBrJ0TUn1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.1/tesseract.min.js" integrity="sha512-Rl3uO5Kb/6VQwWi4KFOeFHrgb3R04QLbTjaCj1eO0MJdHj7FVGHvXZHzVvzJeY9q24apqYh6gMPkTFogyXv3gQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="script.js"></script>
 </body>
 </html>
