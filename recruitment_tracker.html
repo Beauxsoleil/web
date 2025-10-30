@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruitment Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .menu-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .menu-btn:hover {
+            background: #2980b9;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .stat-circle {
+            text-align: center;
+        }
+
+        .circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .calendar-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-header h2 {
+            font-size: 22px;
+            color: #2c3e50;
+        }
+
+        .add-event-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .add-event-btn:hover {
+            background: #229954;
+        }
+
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .event-content {
+            flex: 1;
+        }
+
+        .event-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .event-time {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+
+        .event-actions button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .rss-btn {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .applicants-section {
+            overflow-x: auto;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-applicant-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .applicant-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #3498db;
+        }
+
+        .applicant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .applicant-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .applicant-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-share {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .applicant-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .detail-input {
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .notes-area {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+            flex: 1;
+        }
+
+        .goals-section {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .goal-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #27ae60;
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats {
+                width: 100%;
+                justify-content: space-around;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+            <div class="stats">
+                <div class="stat-circle">
+                    <div class="circle" id="enlistedCount">0</div>
+                    <div class="stat-label">Enlisted</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="applicants-section">
+                <div class="section-title">
+                    Applicants
+                    <button class="add-applicant-btn" onclick="openApplicantModal()">+ Add Applicant</button>
+                </div>
+                <div id="applicantsList"></div>
+
+                <div class="goals-section">
+                    <div class="section-title">
+                        Goals & Progress
+                        <button class="add-applicant-btn" onclick="openGoalModal()">+ Add Goal</button>
+                    </div>
+                    <div id="goalsList"></div>
+                </div>
+            </div>
+
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <h2>Today</h2>
+                    <button class="add-event-btn" onclick="openEventModal()">+ Add Event</button>
+                </div>
+                <div class="event-list" id="eventsList"></div>
+                <button class="rss-btn" onclick="generateRSS()">📅 Generate Calendar File</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applicant Modal -->
+    <div id="applicantModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-header">Add Applicant</h2>
+            <form id="applicantForm">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" id="applicantName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stage</label>
+                    <select class="form-select" id="applicantStage">
+                        <option>Initial Contact</option>
+                        <option>Application Submitted</option>
+                        <option>MEPS Scheduled</option>
+                        <option>MEPS Completed</option>
+                        <option>Awaiting Ship Date</option>
+                        <option>Enlisted</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Age</label>
+                    <input type="number" class="form-input" id="applicantAge">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Physical Health (1-10)</label>
+                    <input type="number" class="form-input" id="applicantHealth" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Prior Service</label>
+                    <select class="form-select" id="applicantPriorService">
+                        <option>None</option>
+                        <option>Army</option>
+                        <option>Navy</option>
+                        <option>Air Force</option>
+                        <option>Marines</option>
+                        <option>Coast Guard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Legal Issues</label>
+                    <select class="form-select" id="applicantLegal">
+                        <option>None</option>
+                        <option>Minor</option>
+                        <option>Requires Waiver</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Education Level</label>
+                    <select class="form-select" id="applicantEducation">
+                        <option>High School Diploma</option>
+                        <option>GED</option>
+                        <option>Some College</option>
+                        <option>Bachelor's Degree</option>
+                        <option>Advanced Degree</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Marital Status</label>
+                    <select class="form-select" id="applicantMarital">
+                        <option>Single</option>
+                        <option>Married</option>
+                        <option>Divorced</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Dependents</label>
+                    <input type="number" class="form-input" id="applicantDependents" min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tattoos/Piercings</label>
+                    <textarea class="form-textarea" id="applicantTattoos" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="applicantNotes" rows="4"></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeApplicantModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-header">Add Event</h2>
+            <form id="eventForm">
+                <div class="form-group">
+                    <label class="form-label">Event Title</label>
+                    <input type="text" class="form-input" id="eventTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date & Time</label>
+                    <input type="datetime-local" class="form-input" id="eventDateTime" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="eventDescription" rows="3"></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEventModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Goal Modal -->
+    <div id="goalModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-header">Add Goal</h2>
+            <form id="goalForm">
+                <div class="form-group">
+                    <label class="form-label">Goal Name</label>
+                    <input type="text" class="form-input" id="goalName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target Number</label>
+                    <input type="number" class="form-input" id="goalTarget" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Current Progress</label>
+                    <input type="number" class="form-input" id="goalCurrent" min="0" value="0">
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeGoalModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        const APPLICANTS_KEY = 'recruitmentApplicants';
+        const EVENTS_KEY = 'recruitmentEvents';
+        const GOALS_KEY = 'recruitmentGoals';
+
+        let applicants = JSON.parse(localStorage.getItem(APPLICANTS_KEY)) || [];
+        let events = JSON.parse(localStorage.getItem(EVENTS_KEY)) || [];
+        let goals = JSON.parse(localStorage.getItem(GOALS_KEY)) || [];
+        let editingApplicantId = null;
+        let editingGoalId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderApplicants();
+            renderEvents();
+            renderGoals();
+            updateEnlistedCount();
+
+            document.getElementById('applicantForm').addEventListener('submit', saveApplicant);
+            document.getElementById('eventForm').addEventListener('submit', saveEvent);
+            document.getElementById('goalForm').addEventListener('submit', saveGoal);
+        });
+
+        function openApplicantModal(id = null) {
+            editingApplicantId = id;
+            const modal = document.getElementById('applicantModal');
+            
+            if (id) {
+                const applicant = applicants.find(a => a.id === id);
+                document.getElementById('applicantName').value = applicant.name;
+                document.getElementById('applicantStage').value = applicant.stage;
+                document.getElementById('applicantAge').value = applicant.age;
+                document.getElementById('applicantHealth').value = applicant.health;
+                document.getElementById('applicantPriorService').value = applicant.priorService;
+                document.getElementById('applicantLegal').value = applicant.legal;
+                document.getElementById('applicantEducation').value = applicant.education;
+                document.getElementById('applicantMarital').value = applicant.marital;
+                document.getElementById('applicantDependents').value = applicant.dependents;
+                document.getElementById('applicantTattoos').value = applicant.tattoos;
+                document.getElementById('applicantNotes').value = applicant.notes;
+            } else {
+                document.getElementById('applicantForm').reset();
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeApplicantModal() {
+            document.getElementById('applicantModal').classList.remove('active');
+            editingApplicantId = null;
+        }
+
+        function saveApplicant(e) {
+            e.preventDefault();
+            
+            const applicantData = {
+                id: editingApplicantId || Date.now(),
+                name: document.getElementById('applicantName').value,
+                stage: document.getElementById('applicantStage').value,
+                age: document.getElementById('applicantAge').value,
+                health: document.getElementById('applicantHealth').value,
+                priorService: document.getElementById('applicantPriorService').value,
+                legal: document.getElementById('applicantLegal').value,
+                education: document.getElementById('applicantEducation').value,
+                marital: document.getElementById('applicantMarital').value,
+                dependents: document.getElementById('applicantDependents').value,
+                tattoos: document.getElementById('applicantTattoos').value,
+                notes: document.getElementById('applicantNotes').value
+            };
+
+            if (editingApplicantId) {
+                const index = applicants.findIndex(a => a.id === editingApplicantId);
+                applicants[index] = applicantData;
+            } else {
+                applicants.push(applicantData);
+            }
+
+            localStorage.setItem(APPLICANTS_KEY, JSON.stringify(applicants));
+            renderApplicants();
+            updateEnlistedCount();
+            closeApplicantModal();
+        }
+
+        function deleteApplicant(id) {
+            if (confirm('Are you sure you want to delete this applicant?')) {
+                applicants = applicants.filter(a => a.id !== id);
+                localStorage.setItem(APPLICANTS_KEY, JSON.stringify(applicants));
+                renderApplicants();
+                updateEnlistedCount();
+            }
+        }
+
+        function renderApplicants() {
+            const container = document.getElementById('applicantsList');
+            container.innerHTML = '';
+
+            applicants.forEach(applicant => {
+                const card = document.createElement('div');
+                card.className = 'applicant-card';
+                card.innerHTML = `
+                    <div class="applicant-header">
+                        <div class="applicant-name">${applicant.name}</div>
+                        <div class="applicant-actions">
+                            <button class="btn btn-share" onclick="generatePDF(${applicant.id})">📄 Report</button>
+                            <button class="btn btn-primary" onclick="openApplicantModal(${applicant.id})">✏️ Edit</button>
+                            <button class="btn btn-delete" onclick="deleteApplicant(${applicant.id})">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="applicant-details">
+                        <div class="detail-group">
+                            <span class="detail-label">Stage</span>
+                            <span class="detail-input">${applicant.stage}</span>
+                        </div>
+                        <div class="detail-group">
+                            <span class="detail-label">Age</span>
+                            <span class="detail-input">${applicant.age || 'N/A'}</span>
+                        </div>
+                        <div class="detail-group">
+                            <span class="detail-label">Physical Health</span>
+                            <span class="detail-input">${applicant.health || 'N/A'}/10</span>
+                        </div>
+                        <div class="detail-group">
+                            <span class="detail-label">Prior Service</span>
+                            <span class="detail-input">${applicant.priorService}</span>
+                        </div>
+                        <div class="detail-group">
+                            <span class="detail-label">Legal Issues</span>
+                            <span class="detail-input">${applicant.legal}</span>
+                        </div>
+                        <div class="detail-group">
+                            <span class="detail-label">Education</span>
+                            <span class="detail-input">${applicant.education}</span>
+                        </div>
+                        <div class="detail-group">
+                            <span class="detail-label">Marital Status</span>
+                            <span class="detail-input">${applicant.marital}</span>
+                        </div>
+                        <div class="detail-group">
+                            <span class="detail-label">Dependents</span>
+                            <span class="detail-input">${applicant.dependents || 0}</span>
+                        </div>
+                    </div>
+                    ${applicant.tattoos ? `<div class="detail-group" style="margin-top: 15px;">
+                        <span class="detail-label">Tattoos/Piercings</span>
+                        <span class="detail-input">${applicant.tattoos}</span>
+                    </div>` : ''}
+                    ${applicant.notes ? `<div class="detail-group" style="margin-top: 15px;">
+                        <span class="detail-label">Notes</span>
+                        <textarea class="notes-area" readonly>${applicant.notes}</textarea>
+                    </div>` : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateEnlistedCount() {
+            const enlistedCount = applicants.filter(a => a.stage === 'Enlisted').length;
+            document.getElementById('enlistedCount').textContent = enlistedCount;
+        }
+
+        function generatePDF(id) {
+            const applicant = applicants.find(a => a.id === id);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(20);
+            doc.text('Applicant Report', 20, 20);
+            
+            doc.setFontSize(12);
+            let y = 40;
+            
+            doc.text(`Name: ${applicant.name}`, 20, y);
+            y += 10;
+            doc.text(`Stage: ${applicant.stage}`, 20, y);
+            y += 10;
+            doc.text(`Age: ${applicant.age || 'N/A'}`, 20, y);
+            y += 10;
+            doc.text(`Physical Health: ${applicant.health || 'N/A'}/10`, 20, y);
+            y += 10;
+            doc.text(`Prior Service: ${applicant.priorService}`, 20, y);
+            y += 10;
+            doc.text(`Legal Issues: ${applicant.legal}`, 20, y);
+            y += 10;
+            doc.text(`Education: ${applicant.education}`, 20, y);
+            y += 10;
+            doc.text(`Marital Status: ${applicant.marital}`, 20, y);
+            y += 10;
+            doc.text(`Dependents: ${applicant.dependents || 0}`, 20, y);
+            y += 15;
+            
+            if (applicant.tattoos) {
+                doc.text('Tattoos/Piercings:', 20, y);
+                y += 7;
+                const tattooLines = doc.splitTextToSize(applicant.tattoos, 170);
+                doc.text(tattooLines, 20, y);
+                y += tattooLines.length * 7 + 10;
+            }
+            
+            if (applicant.notes) {
+                doc.text('Notes:', 20, y);
+                y += 7;
+                const noteLines = doc.splitTextToSize(applicant.notes, 170);
+                doc.text(noteLines, 20, y);
+            }
+
+            doc.save(`${applicant.name.replace(/\s+/g, '_')}_Report.pdf`);
+        }
+
+        function openEventModal() {
+            document.getElementById('eventForm').reset();
+            document.getElementById('eventModal').classList.add('active');
+        }
+
+        function closeEventModal() {
+            document.getElementById('eventModal').classList.remove('active');
+        }
+
+        function saveEvent(e) {
+            e.preventDefault();
+            
+            const eventData = {
+                id: Date.now(),
+                title: document.getElementById('eventTitle').value,
+                dateTime: document.getElementById('eventDateTime').value,
+                description: document.getElementById('eventDescription').value
+            };
+
+            events.push(eventData);
+            localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+            renderEvents();
+            closeEventModal();
+        }
+
+        function deleteEvent(id) {
+            events = events.filter(e => e.id !== id);
+            localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+            renderEvents();
+        }
+
+        function renderEvents() {
+            const container = document.getElementById('eventsList');
+            container.innerHTML = '';
+
+            const sortedEvents = [...events].sort((a, b) => 
+                new Date(a.dateTime) - new Date(b.dateTime)
+            );
+
+            sortedEvents.forEach(event => {
+                const eventDate = new Date(event.dateTime);
+                const formattedDate = eventDate.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+
+                const item = document.createElement('div');
+                item.className = 'event-item';
+                item.innerHTML = `
+                    <div class="event-content">
+                        <div class="event-title">${event.title}</div>
+                        <div class="event-time">${formattedDate}</div>
+                        ${event.description ? `<div class="event-time">${event.description}</div>` : ''}
+                    </div>
+                    <div class="event-actions">
+                        <button onclick="deleteEvent(${event.id})">Delete</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            if (sortedEvents.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">No events scheduled</div>';
+            }
+        }
+
+        function generateRSS() {
+            let icalContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Recruitment Tracker//Events//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Recruitment Events
+X-WR-TIMEZONE:UTC
+`;
+
+            events.forEach(event => {
+                const eventDate = new Date(event.dateTime);
+                const dtstart = formatICalDate(eventDate);
+                const dtend = formatICalDate(new Date(eventDate.getTime() + 60 * 60 * 1000));
+                const dtstamp = formatICalDate(new Date());
+                
+                icalContent += `BEGIN:VEVENT
+DTSTART:${dtstart}
+DTEND:${dtend}
+DTSTAMP:${dtstamp}
+UID:${event.id}@recruitmenttracker
+SUMMARY:${event.title}
+DESCRIPTION:${event.description || ''}
+STATUS:CONFIRMED
+END:VEVENT
+`;
+            });
+
+            icalContent += 'END:VCALENDAR';
+
+            const blob = new Blob([icalContent], { type: 'text/calendar' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'recruitment_events.ics';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('Calendar file downloaded! Import this .ics file into your calendar app.');
+        }
+
+        function formatICalDate(date) {
+            return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        }
+
+        function openGoalModal(id = null) {
+            editingGoalId = id;
+            const modal = document.getElementById('goalModal');
+            
+            if (id) {
+                const goal = goals.find(g => g.id === id);
+                document.getElementById('goalName').value = goal.name;
+                document.getElementById('goalTarget').value = goal.target;
+                document.getElementById('goalCurrent').value = goal.current;
+            } else {
+                document.getElementById('goalForm').reset();
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeGoalModal() {
+            document.getElementById('goalModal').classList.remove('active');
+            editingGoalId = null;
+        }
+
+        function saveGoal(e) {
+            e.preventDefault();
+            
+            const goalData = {
+                id: editingGoalId || Date.now(),
+                name: document.getElementById('goalName').value,
+                target: parseInt(document.getElementById('goalTarget').value),
+                current: parseInt(document.getElementById('goalCurrent').value)
+            };
+
+            if (editingGoalId) {
+                const index = goals.findIndex(g => g.id === editingGoalId);
+                goals[index] = goalData;
+            } else {
+                goals.push(goalData);
+            }
+
+            localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
+            renderGoals();
+            closeGoalModal();
+        }
+
+        function deleteGoal(id) {
+            if (confirm('Are you sure you want to delete this goal?')) {
+                goals = goals.filter(g => g.id !== id);
+                localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
+                renderGoals();
+            }
+        }
+
+        function renderGoals() {
+            const container = document.getElementById('goalsList');
+            container.innerHTML = '';
+
+            goals.forEach(goal => {
+                const percentage = Math.min((goal.current / goal.target) * 100, 100);
+                
+                const item = document.createElement('div');
+                item.className = 'goal-item';
+                item.innerHTML = `
+                    <div class="goal-header">
+                        <div>
+                            <strong>${goal.name}</strong>
+                            <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                                ${goal.current} / ${goal.target} (${percentage.toFixed(0)}%)
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="openGoalModal(${goal.id})">Edit</button>
+                            <button class="btn btn-delete" style="padding: 6px 12px; font-size: 12px;" onclick="deleteGoal(${goal.id})">Delete</button>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            if (goals.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">No goals set yet</div>';
+            }
+        }
+
+        function toggleMenu() {
+            const choice = prompt('Menu Options:\n1. Export All Data\n2. Import Data\n3. Clear All Data\n4. View Statistics\n\nEnter option number (1-4):');
+            
+            switch(choice) {
+                case '1':
+                    exportAllData();
+                    break;
+                case '2':
+                    importData();
+                    break;
+                case '3':
+                    clearAllData();
+                    break;
+                case '4':
+                    showStatistics();
+                    break;
+            }
+        }
+
+        function exportAllData() {
+            const allData = {
+                applicants: applicants,
+                events: events,
+                goals: goals,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(allData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `recruitment_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('Data exported successfully!');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        
+                        if (confirm('This will replace all current data. Continue?')) {
+                            applicants = importedData.applicants || [];
+                            events = importedData.events || [];
+                            goals = importedData.goals || [];
+                            
+                            localStorage.setItem(APPLICANTS_KEY, JSON.stringify(applicants));
+                            localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+                            localStorage.setItem(GOALS_KEY, JSON.stringify(goals));
+                            
+                            renderApplicants();
+                            renderEvents();
+                            renderGoals();
+                            updateEnlistedCount();
+                            
+                            alert('Data imported successfully!');
+                        }
+                    } catch (error) {
+                        alert('Error importing data. Please check the file format.');
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear ALL data? This cannot be undone!')) {
+                if (confirm('Last chance! This will delete everything. Continue?')) {
+                    localStorage.clear();
+                    applicants = [];
+                    events = [];
+                    goals = [];
+                    renderApplicants();
+                    renderEvents();
+                    renderGoals();
+                    updateEnlistedCount();
+                    alert('All data cleared!');
+                }
+            }
+        }
+
+        function showStatistics() {
+            const stats = calculateStatistics();
+            const statsHTML = `
+                <div style="background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: 20px auto;">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">Recruitment Statistics</h2>
+                    <div style="display: grid; gap: 15px;">
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <strong>Total Applicants:</strong> ${stats.totalApplicants}
+                        </div>
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <strong>Enlisted:</strong> ${stats.enlisted}
+                        </div>
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <strong>Conversion Rate:</strong> ${stats.conversionRate}%
+                        </div>
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <strong>Average Age:</strong> ${stats.avgAge} years
+                        </div>
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <strong>Average Health Score:</strong> ${stats.avgHealth}/10
+                        </div>
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <strong>Total Events:</strong> ${stats.totalEvents}
+                        </div>
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <strong>Active Goals:</strong> ${stats.totalGoals}
+                        </div>
+                        <div style="padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                            <strong>Applicants by Stage:</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                ${Object.entries(stats.byStage).map(([stage, count]) => 
+                                    `<li>${stage}: ${count}</li>`
+                                ).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <button onclick="this.parentElement.remove()" style="margin-top: 20px; padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%;">Close</button>
+                </div>
+            `;
+            
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center;';
+            overlay.innerHTML = statsHTML;
+            overlay.onclick = function(e) {
+                if (e.target === overlay) overlay.remove();
+            };
+            document.body.appendChild(overlay);
+        }
+
+        function calculateStatistics() {
+            const totalApplicants = applicants.length;
+            const enlisted = applicants.filter(a => a.stage === 'Enlisted').length;
+            const conversionRate = totalApplicants > 0 ? ((enlisted / totalApplicants) * 100).toFixed(1) : 0;
+            
+            const ages = applicants.filter(a => a.age).map(a => parseInt(a.age));
+            const avgAge = ages.length > 0 ? (ages.reduce((a, b) => a + b, 0) / ages.length).toFixed(1) : 0;
+            
+            const healths = applicants.filter(a => a.health).map(a => parseInt(a.health));
+            const avgHealth = healths.length > 0 ? (healths.reduce((a, b) => a + b, 0) / healths.length).toFixed(1) : 0;
+            
+            const byStage = {};
+            applicants.forEach(a => {
+                byStage[a.stage] = (byStage[a.stage] || 0) + 1;
+            });
+            
+            return {
+                totalApplicants,
+                enlisted,
+                conversionRate,
+                avgAge,
+                avgHealth,
+                totalEvents: events.length,
+                totalGoals: goals.length,
+                byStage
+            };
+        }
+    </script>
+</body>
+</html>
